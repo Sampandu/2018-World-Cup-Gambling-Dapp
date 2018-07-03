@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>2018 FIFA WORLD CUP GUESSING DAPP</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <script src="./node_modules/ethereum-web3-plus/node_modules/web3/dist/web3.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">2018 FIFA World Cup Gambling</h1>
+
+        <div class="table-responsive">
+            <table class="table table-borderless table-hover">
+              <tbody>
+                <tr>
+                  <td><b>Russia</b><img src="https://api.fifa.com/api/v1/picture/flags-fwc2018-4/rus"/></td>
+                  <td class="text-center"><p><b>June 19</b></p><time><b>14:00</b></time></td>
+                  <td><img src="https://api.fifa.com/api/v1/picture/flags-fwc2018-4/egy"/><b>Egypt</b></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        <div class="text-center">
+            <input id="name" type="text" placeholder="Guesser" class="col-sm-3" >
+            <input id="team" list="team" placeholder="which team will win" class="col-sm-3">
+                <datalist id="team">
+                    <option value="Russia">
+                    <option value="Egypt">
+                </datalist>
+            <button id="button" class="btn btn-primary">Submit</button>
+            <h3 id="bettingRecord"></h3>
+        </div>
+    </div>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    
+    
+    <script>             //web3.js   the info related to a contract could be fetched from remix
+        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545")); 
+        web3.eth.defaultAccount = web3.eth.accounts[0];    //setting up an Etheurem account to pay gas for making tranaction
+        let GuessingContract = web3.eth.contract(          // creating the interface for interacting with the contract
+            [
+                {
+                    "constant": true,
+                    "inputs": [],
+                    "name": "getBetting",
+                    "outputs": [
+                        {
+                            "name": "",
+                            "type": "string"
+                        },
+                        {
+                            "name": "",
+                            "type": "string"
+                        }
+                    ],
+                    "payable": false,
+                    "stateMutability": "view",
+                    "type": "function"
+                },
+                {
+                    "constant": false,
+                    "inputs": [
+                        {
+                            "name": "_guesserName",
+                            "type": "string"
+                        },
+                        {
+                            "name": "_team",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "setBetting",
+                    "outputs": [],
+                    "payable": false,
+                    "stateMutability": "nonpayable",
+                    "type": "function"
+                }
+            ]    
+        );
+        let Guess = GuessingContract.at('0x8071d77bf39cadb5008d33f30ad7e1df62785144');  // This is the address of the contract in Etheureum blockchain
+        
+
+
+        $("#button").click(function() {
+            Guess.setBetting($("#name").val(), $("#team").val());
+        });
+        Guess.getBetting(function(error, result){
+            if(!error){
+                $("#bettingRecord").html(result[0]+' bet '+result[1]+' will win the above game');
+                console.log(result);
+            }
+            else
+                console.error(error);
+        });
+    </script>
+</body>
+</html>
